@@ -12,9 +12,9 @@ public final class Huffman {
 
         if (args.length == 0) {
             System.out.println("Please specify whether you want to decode or encode text:");
-            System.out.println("java -jar ru.deewend.huffman.Huffman.jar decode");
+            System.out.println("java -jar Huffman.jar decode");
             System.out.println("OR");
-            System.out.println("java -jar ru.deewend.huffman.Huffman.jar encode");
+            System.out.println("java -jar Huffman.jar encode");
 
             return;
         }
