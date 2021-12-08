@@ -86,27 +86,29 @@ public final class Huffman {
             nodes.add(new HuffmanNode(occurrences.get(key), key));
         }
         while (nodes.size() != 1) {
-            Collections.sort(nodes);
-            final HuffmanNode first = nodes.get(0);
-            final HuffmanNode second = nodes.get(1);
-            nodes.remove(0);
-            nodes.remove(0);
+            nodes.sort(Collections.reverseOrder());
+            final HuffmanNode first = nodes.get(nodes.size() - 1);
+            final HuffmanNode second = nodes.get(nodes.size() - 2);
+            nodes.remove(nodes.size() - 1);
+            nodes.remove(nodes.size() - 1);
             nodes.add(new HuffmanNode(first, second));
         }
 
-        String result = str;
         final Map<String, Character> dictionary = walk(nodes.get(0));
         try (final BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(OUTPUT_FILENAME), StandardCharsets.UTF_8))) {
             writer.write(String.valueOf(dictionary.size()));
             writer.newLine();
+            final Map<Character, String> reversed = new HashMap<>();
             for (final String code : dictionary.keySet()) {
                 final char character = dictionary.get(code);
+                reversed.put(character, code);
+
                 writer.write(code + "=" + character);
                 writer.newLine();
-
-                result = result.replace(String.valueOf(character), code);
             }
-            writer.write(result);
+            for (int i = 0; i < str.length(); i++) {
+                writer.write(reversed.get(str.charAt(i)));
+            }
             writer.newLine();
         }
     }
@@ -150,16 +152,17 @@ public final class Huffman {
                 dictionary = new HashMap<>(numberOfEntriesInDictionary);
                 input.nextLine();
                 while (numberOfEntriesInDictionary-- > 0) {
-                    final String[] parts = input.nextLine().split("=");
-                    if (parts.length != 2) {
+                    final String entry = input.nextLine();
+                    final int separator = entry.indexOf('=');
+                    if (separator == -1) {
                         throw new CorruptedDataException();
                     }
-                    final String code = parts[0];
-                    ensureBinaryString(code);
-                    final String character = parts[1];
+                    final String code = entry.substring(0, separator);
+                    final String character = entry.substring(separator + 1);
                     if (character.length() != 1) {
                         throw new CorruptedDataException();
                     }
+                    ensureBinaryString(code);
                     final char converted = character.charAt(0);
 
                     if (dictionary.containsKey(code)) {
