@@ -94,29 +94,25 @@ public final class Huffman {
             nodes.add(new HuffmanNode(first, second));
         }
 
-        final Map<String, Character> dictionary = walk(nodes.get(0));
+        final Map<Character, String> dictionary = walk(nodes.get(0));
         try (final BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(OUTPUT_FILENAME), StandardCharsets.UTF_8))) {
             writer.write(String.valueOf(dictionary.size()));
             writer.newLine();
-            final Map<Character, String> reversed = new HashMap<>();
-            for (final String code : dictionary.keySet()) {
-                final char character = dictionary.get(code);
-                reversed.put(character, code);
-
-                writer.write(code + "=" + character);
+            for (final Character character : dictionary.keySet()) {
+                writer.write(dictionary.get(character) + "=" + character);
                 writer.newLine();
             }
             for (int i = 0; i < str.length(); i++) {
-                writer.write(reversed.get(str.charAt(i)));
+                writer.write(dictionary.get(str.charAt(i)));
             }
             writer.newLine();
         }
     }
 
-    private Map<String, Character> walk(final HuffmanNode node) {
+    private Map<Character, String> walk(final HuffmanNode node) {
         Objects.requireNonNull(node);
 
-        final Map<String, Character> dictionary = new HashMap<>();
+        final Map<Character, String> dictionary = new HashMap<>();
         walk(node, new StringBuilder(), dictionary);
 
         return dictionary;
@@ -125,7 +121,7 @@ public final class Huffman {
     private void walk(
             final HuffmanNode node,
             final StringBuilder stack,
-            final Map<String, Character> dictionary
+            final Map<Character, String> dictionary
     ) {
         Objects.requireNonNull(node);
         Objects.requireNonNull(dictionary);
@@ -138,7 +134,7 @@ public final class Huffman {
             walk(rightNode, stack.append('1'), dictionary);
             stack.setLength(stack.length() - 1);
         } else {
-            dictionary.put(stack.toString(), node.getCharacter());
+            dictionary.put(node.getCharacter(), stack.toString());
         }
     }
 
